@@ -11,7 +11,7 @@ class ProductController extends Controller
     public function index()
     {
         $product = Product::latest()->paginate(4);
-        return view('product.index' , compact('product'));
+       return view('product.index' , compact('product'));
     }
     public function create()
     {
@@ -27,28 +27,35 @@ class ProductController extends Controller
         $product = Product::create($request->all());
         return redirect()->route('product.index')->with('success','product added successfully');
     }
-    public function show(product $product)
+    public function show($product_id)
     {
+        $product = product::findOrFail($product_id);
         return view('product.show', compact('product'));
     }
-    public function edit(product $product)
+    public function edit($product_id)
     {
+        $product = product::findOrFail($product_id);
         return view('product.edit', compact('product'));
     }
-    public function update(Request $request, product $product)
+    public function update(Request $request, $product_id)
     {
         {
             $request->validate([
             'product_name'=>'required',
             'product_details'=>'required'
             ]);
-            $product = Product::update($request->all());
+            $product = product::findOrFail($product_id);
+            $product->update($request->all());
             return redirect()->route('product.index')->with('success','product updated successfully');
         }
     }
-    public function destroy(product $product)
+    public function destroy($product_id)
     {
+        //Get the product
+        $product = product::findOrFail($product_id);
+        //Delete
         $product->delete();
-        return redirect()->route('product.index')->with('success','product deleted successfully');
+        //Return with success
+        return redirect()->route('product.index')->withSuccess('product deleted successfully');
     }
 }
